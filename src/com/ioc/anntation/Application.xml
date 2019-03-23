@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context.xsd">
+
+  <!--注解-->
+    <!--告诉spring创建容器时需要扫描的包-->
+    <context:component-scan base-package="com.ioc.anntation"/>
+
+
+   <!--
+    &lt;!&ndash;配置CustomerServer到bean容器中&ndash;&gt;
+    <bean id="dao" class="com.ioc.anntation.CustomerDao"></bean>
+    <bean id="customerServer" class="com.ioc.anntation.CustomerServerImpl">
+       &lt;!&ndash; <constructor-arg name="customerDao" ref="dao" ></constructor-arg>
+        <constructor-arg name="name" value="0101我是name" type="java.lang.String" index="1"></constructor-arg>&ndash;&gt;
+        <property name="customerDao" ref="dao"></property>
+    </bean>
+-->
+
+</beans>

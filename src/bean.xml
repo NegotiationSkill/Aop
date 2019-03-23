@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/aop
+       http://www.springframework.org/schema/aop/spring-aop.xsd
+       http://www.springframework.org/schema/context
+       http://www.springframework.org/schema/context/spring-context.xsd
+       http://www.springframework.org/schema/tx
+       http://www.springframework.org/schema/tx/spring-tx.xsd
+       ">
+   <!-- <context:component-scan base-package="com.transation"></context:component-scan>-->
+    <!--transation-->
+    <!--事务管理器的配置
+    <bean id="txManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource"></property>
+    </bean>
+    -->
+    <!--配置让spring支持事务的注解
+    <tx:annotation-driven transaction-manager="txManager" proxy-target-class="true"></tx:annotation-driven>
+    -->
+    <!--配置通知
+        isolation="DEFAULT" ：数据库隔离级别，默认值为default  mysql的默认隔离级别为repeateable
+        read-only="false" ：是否只读，只有查询时才可用
+        no-rollback-for="" ：遇到指定的异常时才会回回滚
+        rollback-for="":指的是一个异常，遇到指定的异常时回滚，其他的异常不回滚
+         timeout="-1" :超时时间，事务的超时时间，为-1时，超时时间为无限
+         propagation="SUPPORTS":事务的传播行为，就是来新的事务时是否开启新事物，只有查询时可以不开启为Support
+
+    <tx:advice id="txAdvice" transaction-manager="txManager">
+        <tx:attributes>
+            <tx:method name="*" timeout="-1" read-only="false" isolation="DEFAULT" />
+            <tx:method name="find*" read-only="true" propagation="SUPPORTS"/>
+        </tx:attributes>
+    </tx:advice>
+    -->
+    <!--配置aop
+        配置切入点表达式
+        配置事务和通知之间的关系
+
+    <aop:config proxy-target-class="true">
+        <aop:pointcut expression="execution(* *..*.*(..))" id="pt1"></aop:pointcut>
+        <aop:advisor advice-ref="txAdvice" pointcut-ref="pt1"></aop:advisor>
+    </aop:config>
+    -->
+
+   <!-- <bean id="accountService" class="com.transation.AccountServerImpl">
+        <property name="accountDao" ref="accountdao"></property>
+    </bean>
+
+    <bean id="accountdao" class="com.transation.AccountDapImpl">
+        <constructor-arg name="jt" ref="jdbcTemplate"></constructor-arg>
+    </bean>-->
+    <!--jdbctemplate-->
+   <bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
+        <property name="dataSource" ref="dataSource"> </property>
+    </bean>
+
+    <bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+        <property name="driverClassName" value="com.mysql.jdbc.Driver">  </property>
+        <property name="url" value="jdbc:mysql://localhost:3306/template?useUnicode=true&amp;characterEncoding=utf8&amp;serverTimezone=GMT%2B8&amp;useSSL=false">  </property>
+        <property name="username" value="root"></property>
+        <property name="password" value="123"></property>
+    </bean>
+   <!-- <bean id="accountDao" class="com.spring.jdbctemplate.AccountDapImpl"></bean>-->
+    <bean id="support" class="com.spring.jdbctemplate.Support">
+        <property name="data" ref="dataSource"></property>
+    </bean>
+
+
+
+
+
+
+
+        <!--将通知交给spring-->
+        <!--配置Spring 创建容器时要扫描的包-->
+    <context:component-scan base-package="com.liuqijun.spring,Util"/>
+
+        <!--告知spring切面配置,让其支持aop注解-->
+   <!-- <aop:aspectj-autoproxy />-->
+    <bean id="customerServer" class="com.liuqijun.spring.CustomerServerImp"></bean>
+    <bean id="logger" class="Util.CustomerLogger"></bean>
+    <aop:config>
+        <!--
+            id :是唯一标识一个切面
+            ref:是通知类的bean
+            before：表明通知类型（前置通知）
+            method:具体的通知方法，表明在切入点执行之前执行star方法
+            execution:是切入点表达式，用来表明要增强的切入点是哪个，切入点表达式有很多形式
+                    1.全匹配方式：修饰符 返回值类型 包名.包名..类名.方法名（参数列表）  例如：public void com.liuqijun.spring.CustomerServerImp.save()
+                    2.全通配方式：* *..*.*(..)             *称为通配符
+                        修饰符可以省略，所以第一个*表示返回值
+                        包也可以用*代替，但是有多少个包就得有多少个*。例：com.liuqijun.spring.CustomerServerImp.save() <==> *.*.*.CustomerServerImp.save()
+                        .. 表示当前包以及子包  com.liuqijun.spring.CustomerServerImp.save()可以写为com..CustomerServerImp.save()  (表示com包下的所有子包中的CustomerServerImpl类中的save方法)或者*..CustomerServerImp.save() （任意包中的CustomerServerImp.save()）
+                        类名和函数名可以用*代替，com.liuqijun.spring.CustomerServerImp.save() <==> *..*.*()
+                    参数列表：可以直接使用具体的类型，基本类型可以直接使用，引用类型 包名.类名
+                        例： 基础类型 int
+                            引用类型：java.lang.Integer
+                         参数可以用*代替，但是切入点必须有参数才可以
+                         参数也可以用..代替，表示有参无参都可以
+        -->
+
+        <aop:pointcut expression="execution(public void com.liuqijun.spring.CustomerServerImp.save())" id="p1"></aop:pointcut>
+
+        <aop:aspect id="loggerAspect" ref="logger">
+<!--
+
+           <aop:before method="star" pointcut="execution(public void com.liuqijun.spring.CustomerServerImp.save())"/>
+            <aop:after method="stop" pointcut="execution(* *..*.*(..))"/>
+-->
+
+            <!--前置通知   永远在切入点之前执行-->
+           <aop:before method="beforAdvice" pointcut-ref="p1"/>
+          <!--后置通知    在没有异常时在切入点之后执行-->
+            <aop:after-returning method="afterReturn" pointcut-ref="p1"/>
+          <!-- 最终通知    永远在切入点的最后执行-->
+            <aop:after method="after" pointcut-ref="p1"/>
+           <!--异常通知-->
+            <aop:after-throwing method="throwing" pointcut-ref="p1"/>
+           <!--环绕通知
+                当配置环绕同时，切入点没有执行但是环绕通知里边的代码执行了。
+                分析：有动态代理知道，环绕通知就是Invoke方法，并且里面要有明确的切入点方法调用，我们当前的没有
+                解决：在环绕通知方法中调用切入点
+            -->
+           <!-- <aop:around method="around" pointcut-ref="p1"/>-->
+        </aop:aspect>
+    </aop:config>
+
+
+</beans>
